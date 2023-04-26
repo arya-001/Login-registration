@@ -2,57 +2,73 @@
 
 
 
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Text,
-} from 'react-native';
+import {  View,  StyleSheet,  ScrollView,  Text,} from 'react-native';
 import React, {useState} from 'react';
 import CustomInput from '../components/CustomInput';
-import CustomeButton from '../components/CustomeButton';
+import CustomeButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import Background from './Background';
 import {useForm} from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { signUpUser } from '../actions/act';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import rootReducer from '../actions/reducers';
+import { SIGNUP_FAILURE, SIGNUP_SUCCESS } from '../actions/reducers';
 
 const EMAIL_REGEX =
   /^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+)@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-  
-
-
-
 const SignUp = () => {
-  const dispatch = useDispatch();
+  const API_URL = `http://10.0.2.2:3000`;
 
-  //const {height} = useWindowDimensions();
   const navigation = useNavigation();
   const {
     control,
     handleSubmit,
     formState: {errors},
-    watch,
+    watch, reset
   } = useForm();
 
 
   const pwd = watch('password');
+  const dispatch = useDispatch();
 
 
-
-  const onSignUpPress = (data) => {
-    console.warn('Signining Up here');
-    dispatch(signUpUser(
-      data.username,
-      data.email,
-      data.password,
-      navigation
-    ));
+  const onSignUpPress = async (data) => {
+    if (data.password !== data.confirmPassword) {
+      console.log("Passwords do not match");
+      return;
+    }
+  
+    console.log("func called");
+    try {
+      const res = await axios.post(`${API_URL}/signup`, {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      });
+      console.log("response", JSON.stringify(res));
+      console.log(res);
+      console.log(res.data);
+  
+      dispatch({
+        type: SIGNUP_SUCCESS,
+        payload: {
+          user: res.data.user,
+          token: res.data.token
+        }
+      });
+  reset();
+      navigation.navigate("ConfirmSignUp");
+    } catch (error) {
+      console.log("error", error);
+  
+      dispatch({
+        type: SIGNUP_FAILURE,
+        payload: error.message
+      });
+    }
   };
-
-
-
+  
 
   const onSignInFacebook = () => {
     console.warn('Facebook');
@@ -181,9 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    //     flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
+  
   },
   logo: {
     maxWidth: 300,
@@ -205,30 +219,138 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUp;
-
-
-// export default connect(null, { registerUser })(SignUp);
+export default (SignUp);
 
 
 
 
-  // const onSignUpPress = () => {
-  //   console.warn('Signining Up here');
-  // //   // // navigation.navigate('ConfirmSignUp', {username});
-  //   // navigation.navigate('ConfirmSignUp');
-  //   // registerUser(data);
-  //   navigation.navigate('ConfirmSignUp');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // const onSignUpPress = async (data) => {
+  //   if (data.password !== data.confirmPassword) {
+  //     console.log("Passwords do not match");
+  //     return;
+  //   }
+  //   console.log("func called");
+  //   try {
+  //     const res = await axios.post(`${API_URL}/signup`, {
+  //       username: data.username,
+  //       email: data.email,
+  //       password: data.password,
+  //     });
+  //     console.log("response", JSON.stringify(res));
+  //     console.log(res);
+  //     console.log(res.data);
+  //     navigation.navigate("ConfirmSignUp");
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
   // };
+  
 
   // const onSignUpPress = (data) => {
-  //     console.warn('Signining Up here');
-  //   signup(
-  //     data.username,
-  //     data.email,
-  //     data.password,
-  //     data.confirmPassword,
-  //     navigation
-  //   )(dispatch);
+  //   console.log("func called");
+  //   axios.post(`${API_URL}/signup`, { username: data.username, email:data.email, password: data.password }).then(res => {
+  //       console.log("response", JSON.stringify(res));
+  //       console.log(res);
+  //       console.log(res.data)
+  //       navigation.navigate("ConfirmSignUp");
+  //   }).catch(error => console.log("error", error)); 
   // };
+
+
+//   const onSignUpPress = (data) => {
+// // /*     console.log("signing up? god hoja na bhai ");
+// //     console.warn("signing up? god hoja na bhai ");
+// //  */
+//     console.log("func called");
+//     axios.post(`${API_URL}/signup`, { username: data.username, email:data.email, password: data.password }).then(res => {
+//         console.log("response", JSON.stringify(res));
+//         console.log(res);
+//         console.log(res.data)
+//         navigation.navigate("ConfirmSignUp");
+//     }).catch(error => console.log("error", error)); 
+
+// //     console.warn("signing up? god hoja na bhai ");
+
+// //     // //navigation.navigate('confirmSignup');
+// //      signup(
+// //       data.username,
+// //       data.email,
+// //       data.password,
+// //       navigation
+// //     )(dispatch);
+// //     // dispatch(signup(username, email, password, navigation));
+
+//   };
+
+// const onSignUpPress = async (data) => {
+//   const result = await dispatch(signup(data.username, data.email, data.password, data.confirmPassword));
+//   if (result.success) {
+//     navigation.navigate('confirmSignUp');
+//   }
+// };
+

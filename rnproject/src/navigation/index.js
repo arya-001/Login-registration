@@ -19,7 +19,7 @@ const Navigation = () => {
       <Background height="100%">
     <Stack.Navigator screenOptions={{headerShown:false}}>
     <Stack.Screen name= "SignIn" component={SignIn}/>
-    <Stack.Screen name= "SignUp" component={SignUp}/>
+    <Stack.Screen name= "SignUp" component= {SignUp}/>
     <Stack.Screen name= "ConfirmSignUp" component={ConfirmSignUp}/>
     <Stack.Screen name= "RequestResetPassword" component={RequestResetPassword}/>
     <Stack.Screen name= "NewPassword" component={NewPassword}/>

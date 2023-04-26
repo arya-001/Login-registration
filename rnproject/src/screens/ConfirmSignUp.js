@@ -1,15 +1,16 @@
 import {View, StyleSheet, Image, useWindowDimensions, ScrollView, Text } from 'react-native'
 import React, { useState } from 'react'
 import CustomInput from '../components/CustomInput';
-import CustomeButton from '../components/CustomeButton';
+import CustomeButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {useRoute} from '@react-navigation/native'
 
+
 const ConfirmSignUp = () => {
-    // const [code , setCode] = useState('');
     const {control, handleSubmit} = useForm({
         defaultValues: {username: route?.params?.username},});
+
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -24,9 +25,8 @@ const onBackToSignIn = ()=>{
 
 
 const onConfirmPress = (data)=>{
-    // console.warn("onConfirmPress ");
-    console.log(data);
-    navigation.navigate('Home')
+    console.warn("onConfirmPress ");
+     navigation.navigate('Home')
 }
 
     return (

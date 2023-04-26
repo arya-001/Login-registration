@@ -32,23 +32,63 @@ app.get('/users', (req, res) => {
   });
 });
 
+// app.post('/login', (req, res) => {
+//   const { email, password } = req.body || {} ;
+//   console.log('====================================');
+//   console.log(" Login API Called");
+//   console.log('====================================');
+//   if (!email || !password) {
+//     res.status(400).send('Email and password are required');
+//     return;
+//   }
+//   connection.query(
+//     'SELECT * FROM users WHERE email = ?',
+//     [email],
+//     (error, results, fields) => {
+//       if (error) {
+//         console.error(error);
+//         res.status(500).send('Error retrieving user from database');
+//       } else if (results.length === 0) {
+//         res.status(401).send('Invalid email or password');
+//       } else {
+//         const user = results[0];
+//         bcrypt.compare(password, user.password, (error, result) => {
+//           if (error) {
+//             console.error(error);
+//             res.status(500).send('Error comparing passwords');
+//           } else if (result === false) {
+//             res.status(401).send('Invalid email or password');
+//           } else {
+//             const token = jwt.sign(
+//               { userId: user.user_id, email: user.email },
+//               'secret_key',
+//               { expiresIn: '1h' }
+//             );
+//             res.send({ token });
+//           }
+//         });
+//       }
+//     }
+//   );
+// });
 app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    res.status(400).send('Email and password are required');
+  const {emailOrUsername, password} = req.body || {};
+  console.log('====================================');
+  console.log(' Login API Called');
+  console.log('====================================');
+  if (!emailOrUsername || !password) {
+    res.status(400).send('Email/username and password are required');
     return;
   }
-
   connection.query(
-    'SELECT * FROM users WHERE email = ?',
-    [email],
+    'SELECT * FROM users WHERE email = ? OR username = ?',
+    [emailOrUsername, emailOrUsername],
     (error, results, fields) => {
       if (error) {
         console.error(error);
         res.status(500).send('Error retrieving user from database');
       } else if (results.length === 0) {
-        res.status(401).send('Invalid email or password');
+        res.status(401).send('Invalid email/username or password');
       } else {
         const user = results[0];
         bcrypt.compare(password, user.password, (error, result) => {
@@ -56,24 +96,26 @@ app.post('/login', (req, res) => {
             console.error(error);
             res.status(500).send('Error comparing passwords');
           } else if (result === false) {
-            res.status(401).send('Invalid email or password');
+            res.status(401).send('Invalid email/username or password');
           } else {
             const token = jwt.sign(
-              { userId: user.user_id, email: user.email },
+              {userId: user.user_id, email: user.email},
               'secret_key',
-              { expiresIn: '1h' }
+              {expiresIn: '1h'},
             );
-            res.send({ token });
+            res.send({token});
           }
         });
       }
-    }
+    },
   );
 });
 
 app.post('/signup', (req, res) => {
-  const { username, email, password } = req.body;
-
+  const {username, email, password} = req.body;
+  console.log('====================================');
+  console.log('SignUp API Called');
+  console.log('====================================');
   if (!username || !email || !password) {
     res.status(400).send('Username, email, and password are required');
     return;
@@ -83,29 +125,28 @@ app.post('/signup', (req, res) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error hashing password');
-    } else {
-      connection.query(
-        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-        [username, email, hash],
-        (error, results, fields) => {
-          if (error) {
-            console.error(error);
-            res.status(500).send('Error inserting user into database');
-          } else {
-            const token = jwt.sign(
-              { userId: results.insertId, email },
-              'secret_key',
-              { expiresIn: '1h' }
-              );
-              res.send({ token });
-            }
-          }
-        );
-      }
-    });
+      return;
+    }
+    connection.query(
+      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+      [username, email, hash],
+      (error, results, fields) => {
+        if (error) {
+          console.error(error);
+          res.status(500).send('Error inserting user into database');
+        } else {
+          const token = jwt.sign(
+            {userId: results.insertId, email},
+            'secret_key',
+            {expiresIn: '1h'},
+          );
+          res.send({token});
+        }
+      },
+    );
   });
+});
 
-  
 app.listen(3000, () => {
   console.log('Server listening on port 3000');
 });

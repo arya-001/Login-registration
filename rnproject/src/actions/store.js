@@ -5,6 +5,3 @@ import rootReducer from './reducers';
 const store = createStore(rootReducer, applyMiddleware(thunk));
 export default store;
 
-
-
-//aftercommitting
